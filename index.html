@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <h1>Quiz</h1>
+        <div id="quiz-content">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+       const quizData = [
+    
+    {
+        question: "Which programming language is primarily used for web development?",
+        options: ["Python", "JavaScript", "Java", "C++"],
+        answer: 1,
+    },
+    {
+        question: "Which of the following is an example of an operating system?",
+        options: ["Microsoft Word", "Windows 10", "Google Chrome", "Visual Studio Code"],
+        answer: 1,
+    },
+    
+    {
+        question: "What is the main function of RAM in a computer?",
+        options: ["To store data permanently", "To store data temporarily", "To perform calculations", "To display graphics"],
+        answer: 1,
+    },
+    
+    {
+        question: "Which of the following is a type of software malware?",
+        options: ["Virus", "Firewall", "Operating System", "Browser"],
+        answer: 0,
+    },
+    
+    {
+        question: "What is the primary function of an operating system?",
+        options: ["To run applications", "To manage hardware resources", "To connect to the internet", "To edit documents"],
+        answer: 1,
+    },
+   
+    
+];
+
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const quizContent = document.getElementById("quiz-content");
+
+        function loadQuestion() {
+            const questionData = quizData[currentQuestion];
+            quizContent.innerHTML = `
+                <div class="question">${questionData.question}</div>
+                <div class="options">
+                    ${questionData.options
+                        .map(
+                            (option, index) => `
+                            <div>
+                                <input type="radio" id="option${index}" name="option" value="${index}">
+                                <label for="option${index}">${option}</label>
+                            </div>`
+                        )
+                        .join("")}
+                </div>
+                <button class="btn" onclick="submitAnswer()">Submit</button>
+                <div class="feedback" id="feedback"></div>
+            `;
+        }
+
+        function submitAnswer() {
+            const selectedOption = document.querySelector("input[name='option']:checked");
+            const feedback = document.getElementById("feedback");
+
+            if (!selectedOption) {
+                feedback.textContent = "Please select an option!";
+                feedback.style.color = "red";
+                return;
+            }
+
+            const answer = parseInt(selectedOption.value);
+            const correctAnswer = quizData[currentQuestion].answer;
+
+            if (answer === correctAnswer) {
+                score++;
+                feedback.textContent = "Correct!";
+                feedback.style.color = "green";
+                selectedOption.classList.add('correct');
+            } else {
+                feedback.textContent = "Wrong!";
+                feedback.style.color = "red";
+                selectedOption.classList.add('wrong');
+                document.getElementById(`option${correctAnswer}`).classList.add('correct');
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showScore();
+                }
+            }, 2000);
+        }
+
+        function showScore() {
+            quizContent.innerHTML = `
+                <div class="score">Your score: ${score}/${quizData.length}</div>
+                ${score === quizData.length ? `<div class='celebration'>🎉 Perfect Score! 🎉</div>` : ''}
+                <div class="correct-answer">
+                    ${quizData.map((questionData, index) => {
+                        const answerText = questionData.options[questionData.answer];
+                        return `<p>Q${index + 1}: ${questionData.question}<br> Correct answer: ${answerText}</p>`;
+                    }).join('')}
+                </div>
+                <button class="btn" onclick="restartQuiz()">Restart Quiz</button>
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
